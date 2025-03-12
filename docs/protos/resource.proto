@@ -1,0 +1,269 @@
+syntax="proto3";
+
+package ResourceService;
+
+option go_package = "github.com/pedroxer/resource-service/internal/proto_gen";
+
+
+import "google/protobuf/timestamp.proto";
+
+service ResourceService {
+  // Методы для управления рабочими местами
+  rpc GetWorkplaces(GetWorkplacesRequest) returns (GetWorkplacesResponse);
+  rpc GetWorkplaceById(GetWorkplaceByIdRequest) returns (Workplace);
+  rpc CreateWorkplace(CreateWorkplaceRequest) returns (Workplace);
+  rpc UpdateWorkplace(UpdateWorkplaceRequest) returns (Workplace);
+  rpc DeleteWorkplace(DeleteWorkplaceRequest) returns (DeleteWorkplaceResponse);
+  rpc CheckWorkplaceAvailability(CheckWorkplaceAvailabilityRequest) returns (WorkplaceAvailabilityResponse);
+
+  // Методы для управления парковочными местами
+  rpc GetParkingSpaces(GetParkingSpacesRequest) returns (GetParkingSpacesResponse);
+  rpc GetParkingSpaceById(GetParkingSpaceByIdRequest) returns (ParkingSpace);
+  rpc CreateParkingSpace(CreateParkingSpaceRequest) returns (ParkingSpace);
+  rpc UpdateParkingSpace(UpdateParkingSpaceRequest) returns (ParkingSpace);
+  rpc DeleteParkingSpace(DeleteParkingSpaceRequest) returns (DeleteParkingSpaceResponse);
+  rpc CheckParkingSpaceAvailability(CheckParkingSpaceAvailabilityRequest) returns (ParkingSpaceAvailabilityResponse);
+
+  // Методы для управления предметами
+  rpc GetItems(GetItemsRequest) returns (GetItemsResponse);
+  rpc GetItemById(GetItemByIdRequest) returns (Item);
+  rpc CreateItem(CreateItemRequest) returns (Item);
+  rpc UpdateItem(UpdateItemRequest) returns (Item);
+  rpc DeleteItem(DeleteItemRequest) returns (DeleteItemResponse);
+
+  rpc AttachItemToWorkplace(AttachItemToWorkplaceRequest) returns (Item);
+}
+
+// Сообщения для рабочих мест
+message Workplace {
+  int32 id = 1;
+  string address = 2;
+  string zone = 3;
+  string floor = 4;
+  int32 number = 5;
+  string type = 6;
+  int32 capacity = 7;
+  string description = 8;
+  bool is_available = 9;
+  string maintenance_status = 10;
+  google.protobuf.Timestamp created_at = 11;
+  google.protobuf.Timestamp updated_at = 12;
+  repeated Item items = 13;
+  repeated string tags = 14;
+}
+
+message GetWorkplacesRequest {
+  string zone = 1;
+  string floor = 2;
+  string type = 3;
+  int32 capacity = 4;
+  bool is_available = 5;
+  int32 page = 6;
+  int32 page_size = 7;
+}
+
+message GetWorkplacesResponse {
+  repeated Workplace workplaces = 1;
+  int32 total_count = 2;
+  int32 page = 3;
+  int32 page_size = 4;
+}
+
+message GetWorkplaceByIdRequest {
+  int32 id = 1;
+}
+
+message CreateWorkplaceRequest {
+  string address = 1;
+  string zone = 2;
+  string floor = 3;
+  int32 number = 4;
+  string type = 5;
+  int32 capacity = 6;
+  string description = 7;
+  bool is_available = 8;
+  string maintenance_status = 9;
+  repeated string tags = 10;
+}
+
+message UpdateWorkplaceRequest {
+  int32 id = 1;
+  string address = 2;
+  string zone = 3;
+  string floor = 4;
+  int32 number = 5;
+  string type = 6;
+  int32 capacity = 7;
+  string description = 8;
+  bool is_available = 9;
+  string maintenance_status = 10;
+  repeated string tags = 11;
+}
+
+message DeleteWorkplaceRequest {
+  int32 id = 1;
+}
+
+message DeleteWorkplaceResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message CheckWorkplaceAvailabilityRequest {
+  int32 id = 1;
+  google.protobuf.Timestamp start_time = 2;
+  google.protobuf.Timestamp end_time = 3;
+}
+
+message WorkplaceAvailabilityResponse {
+  bool is_available = 1;
+  repeated TimeSlot unavailable_slots = 2;
+}
+
+message TimeSlot {
+  google.protobuf.Timestamp start_time = 1;
+  google.protobuf.Timestamp end_time = 2;
+  string reason = 3;
+}
+
+// Сообщения для парковочных мест
+message ParkingSpace {
+  int32 id = 1;
+  int32 number = 2;
+  string location = 3;
+  string type = 4;
+  bool is_available = 5;
+  string description = 6;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
+}
+
+message GetParkingSpacesRequest {
+  string location = 1;
+  string type = 2;
+  bool is_available = 3;
+  int32 page = 4;
+  int32 page_size = 5;
+}
+
+message GetParkingSpacesResponse {
+  repeated ParkingSpace parking_spaces = 1;
+  int32 total_count = 2;
+  int32 page = 3;
+  int32 page_size = 4;
+}
+
+message GetParkingSpaceByIdRequest {
+  int32 id = 1;
+}
+
+message CreateParkingSpaceRequest {
+  int32 number = 1;
+  string location = 2;
+  string type = 3;
+  bool is_available = 4;
+  string description = 5;
+}
+
+message UpdateParkingSpaceRequest {
+  int32 id = 1;
+  int32 number = 2;
+  string location = 3;
+  string type = 4;
+  bool is_available = 5;
+  string description = 6;
+}
+
+message DeleteParkingSpaceRequest {
+  int32 id = 1;
+}
+
+message DeleteParkingSpaceResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message CheckParkingSpaceAvailabilityRequest {
+  int32 id = 1;
+  google.protobuf.Timestamp start_time = 2;
+  google.protobuf.Timestamp end_time = 3;
+}
+
+message ParkingSpaceAvailabilityResponse {
+  bool is_available = 1;
+  repeated TimeSlot unavailable_slots = 2;
+}
+
+// Сообщения для предметов
+message Item {
+  int32 id = 1;
+  string type = 2;
+  string name = 3;
+  int32 condition_id = 4;
+  int32 workplace_id = 5;
+  int32 quantity = 6;
+  bool is_available = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
+  ItemCondition condition = 10;
+}
+
+message ItemCondition {
+  int32 id = 1;
+  string value = 2;
+  string description = 3;
+}
+
+message GetItemsRequest {
+  string type = 1;
+  string name = 2;
+  int32 condition_id = 3;
+  int32 workplace_id = 4;
+  bool is_available = 5;
+  int32 page = 6;
+  int32 page_size = 7;
+}
+
+message GetItemsResponse {
+  repeated Item items = 1;
+  int32 total_count = 2;
+  int32 page = 3;
+  int32 page_size = 4;
+}
+
+message GetItemByIdRequest {
+  int32 id = 1;
+}
+
+message CreateItemRequest {
+  string type = 1;
+  string name = 2;
+  int32 condition_id = 3;
+  int32 workplace_id = 4;
+  int32 quantity = 5;
+  bool is_available = 6;
+}
+
+message UpdateItemRequest {
+  int32 id = 1;
+  string type = 2;
+  string name = 3;
+  int32 condition_id = 4;
+  int32 workplace_id = 5;
+  int32 quantity = 6;
+  bool is_available = 7;
+}
+
+message DeleteItemRequest {
+  int32 id = 1;
+}
+
+message DeleteItemResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message AttachItemToWorkplaceRequest {
+    int32 item_id = 1;
+    int32 workplace_id = 2;
+  }
