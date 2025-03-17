@@ -4,22 +4,22 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/pedroxer/resource-service/internal/config"
 	"github.com/pedroxer/resource-service/internal/database"
+	database_models "github.com/pedroxer/resource-service/internal/models/database"
 	log "github.com/sirupsen/logrus"
 )
 
-
-type Storage struct{
-	db *pgx.Conn
+type Storage struct {
+	db     *pgx.Conn
 	logger *log.Logger
 }
 
-func NewStorage(cfg *config.Postgres, logger *log.Logger) (*Storage, error){
+func NewStorage(cfg *config.Postgres, logger *log.Logger) (*Storage, error) {
 	pgConn, err := database.ConnectToPg(cfg)
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 	return &Storage{
-		db: pgConn,
+		db:     pgConn,
 		logger: logger,
 	}, nil
 }

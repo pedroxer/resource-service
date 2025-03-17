@@ -8,37 +8,32 @@ import (
 	"google.golang.org/grpc"
 )
 
-type App struct{
-	logger *log.Logger
+type App struct {
+	logger     *log.Logger
 	grpcServer *grpc.Server
-	port int
+	port       int
 }
 
-type Interceptor interface{
-	Unary() grpc.UnaryServerInterceptor
-	Stream() grpc.StreamServerInterceptor
-}
-func NewApp(log *log.Logger, port int)*App{
+func NewApp(log *log.Logger, port int) *App {
 	server := grpc.NewServer()
 
 	return &App{
-		logger: log,
+		logger:     log,
 		grpcServer: server,
-		port: port,
+		port:       port,
 	}
 }
 
-func (a *App) Run() error{
+func (a *App) Run() error {
 	l, err := net.Listen("tcp", fmt.Sprintf(":%d", a.port))
-	if err != nil{
+	if err != nil {
 		log.Fatal(err)
 	}
 	a.logger.Infof("starting grpc server on port %d", a.port)
 	return a.grpcServer.Serve(l)
 }
 
-	
-func (a *App) Stop(){
+func (a *App) Stop() {
 	a.logger.Info("stopping grpc server")
 	a.grpcServer.GracefulStop()
 }
