@@ -36,3 +36,14 @@ type TimeSlot struct {
 	To     time.Time
 	Reason string
 }
+
+type ParkingPlace struct {
+	Id          int64
+	Number      int64
+	Location    string
+	Type        string
+	IsAvailable bool
+	Description string
+	CreatedAt   time.Time
+	UpdatedAt   time.Time
+}

@@ -4,7 +4,6 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/pedroxer/resource-service/internal/config"
 	"github.com/pedroxer/resource-service/internal/database"
-	database_models "github.com/pedroxer/resource-service/internal/models/database"
 	log "github.com/sirupsen/logrus"
 )
 
