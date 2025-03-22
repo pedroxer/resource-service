@@ -2,7 +2,7 @@ package grpc
 
 import (
 	"context"
-	"github.com/pedroxer/resource-service/internal/models/services"
+	"github.com/pedroxer/resource-service/internal/models"
 	"github.com/pedroxer/resource-service/internal/proto_gen"
 	"github.com/pedroxer/resource-service/internal/utills"
 	"google.golang.org/grpc/codes"
@@ -12,10 +12,10 @@ import (
 )
 
 type ItemService interface {
-	GetItems(itemType, name string, conditionId, workplaceId int64, isAvailable bool, page, pageSize int64) ([]services.Item, int64, error)
-	GetItemById(id int64) (services.Item, error)
-	CreateItem(item *services.Item) (int64, error)
-	UpdateItem(item *services.Item) (services.Item, error)
+	GetItems(itemType, name string, conditionId, workplaceId int64, isAvailable bool, page, pageSize int64) ([]models.Item, int64, error)
+	GetItemById(id int64) (models.Item, error)
+	CreateItem(item *models.Item) (int64, error)
+	UpdateItem(item *models.Item) (models.Item, error)
 	DeleteItem(id int64) error
 }
 
@@ -67,7 +67,7 @@ func (s *serverAPI) GetItemById(ctx context.Context, req *proto_gen.GetItemByIdR
 }
 
 func (s *serverAPI) CreateItem(ctx context.Context, req *proto_gen.CreateItemRequest) (*proto_gen.Item, error) {
-	item := services.Item{
+	item := models.Item{
 		Type:        req.Type,
 		Name:        req.Name,
 		Condition:   utills.IdsToConditions[req.ConditionId],
@@ -93,7 +93,7 @@ func (s *serverAPI) CreateItem(ctx context.Context, req *proto_gen.CreateItemReq
 }
 
 func (s *serverAPI) UpdateItem(ctx context.Context, req *proto_gen.UpdateItemRequest) (*proto_gen.Item, error) {
-	item := services.Item{
+	item := models.Item{
 		Id:          req.Id,
 		Type:        req.Type,
 		Name:        req.Name,

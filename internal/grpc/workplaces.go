@@ -2,7 +2,7 @@ package grpc
 
 import (
 	"context"
-	"github.com/pedroxer/resource-service/internal/models/services"
+	"github.com/pedroxer/resource-service/internal/models"
 	"github.com/pedroxer/resource-service/internal/proto_gen"
 	"github.com/pedroxer/resource-service/internal/utills"
 	"google.golang.org/grpc/codes"
@@ -12,12 +12,12 @@ import (
 )
 
 type WorkplaceService interface {
-	GetWorkplaces(zone, floor, workplaceType string, capacity int64, isAvailable bool, page, pageSize int64) ([]services.Workplace, int64, error)
-	GetWorkplacesById(id int64) (services.Workplace, error)
-	CreateWorkplace(workplace services.Workplace) (services.Workplace, error)
-	UpdateWorkplace(workplace services.Workplace) (services.Workplace, error)
+	GetWorkplaces(zone, floor, workplaceType string, capacity int64, isAvailable bool, page, pageSize int64) ([]models.Workplace, int64, error)
+	GetWorkplacesById(id int64) (models.Workplace, error)
+	CreateWorkplace(workplace models.Workplace) (models.Workplace, error)
+	UpdateWorkplace(workplace models.Workplace) (models.Workplace, error)
 	DeleteWorkplace(id int64) error
-	CheckWorkplaceAvailability(id int64) (bool, []services.TimeSlot, error)
+	CheckWorkplaceAvailability(id int64) (bool, []models.TimeSlot, error)
 }
 
 func (s *serverAPI) GetWorkplaces(ctx context.Context, req *proto_gen.GetWorkplacesRequest) (*proto_gen.GetWorkplacesResponse, error) {
@@ -47,7 +47,7 @@ func (s *serverAPI) GetWorkplaceById(ctx context.Context, req *proto_gen.GetWork
 	return castServiceWorkplaceToProto(workplace), nil
 }
 func (s *serverAPI) CreateWorkplace(ctx context.Context, req *proto_gen.CreateWorkplaceRequest) (*proto_gen.Workplace, error) {
-	workplace, err := s.workplaces.CreateWorkplace(services.Workplace{
+	workplace, err := s.workplaces.CreateWorkplace(models.Workplace{
 		Address:           req.Address,
 		Zone:              req.Zone,
 		Floor:             req.Floor,
@@ -71,7 +71,7 @@ func (s *serverAPI) UpdateWorkplace(ctx context.Context, req *proto_gen.UpdateWo
 	if req.GetId() == 0 {
 		return nil, status.Error(codes.InvalidArgument, "id is required")
 	}
-	workplace, err := s.workplaces.UpdateWorkplace(services.Workplace{
+	workplace, err := s.workplaces.UpdateWorkplace(models.Workplace{
 		Id:                req.Id,
 		Address:           req.Address,
 		Zone:              req.Zone,
@@ -122,7 +122,7 @@ func (s *serverAPI) CheckWorkplaceAvailability(ctx context.Context, req *proto_g
 	return result, nil
 }
 
-func castServiceWorkplaceToProto(workplace services.Workplace) *proto_gen.Workplace {
+func castServiceWorkplaceToProto(workplace models.Workplace) *proto_gen.Workplace {
 	protoWorkplace := &proto_gen.Workplace{
 		Id:                workplace.Id,
 		Address:           workplace.Address,
