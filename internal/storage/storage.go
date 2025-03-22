@@ -7,19 +7,18 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-
-type Storage struct{
-	db *pgx.Conn
+type Storage struct {
+	db     *pgx.Conn
 	logger *log.Logger
 }
 
-func NewStorage(cfg *config.Postgres, logger *log.Logger) (*Storage, error){
+func NewStorage(cfg *config.Postgres, logger *log.Logger) (*Storage, error) {
 	pgConn, err := database.ConnectToPg(cfg)
-	if err != nil{
+	if err != nil {
 		return nil, err
 	}
 	return &Storage{
-		db: pgConn,
+		db:     pgConn,
 		logger: logger,
 	}, nil
 }
