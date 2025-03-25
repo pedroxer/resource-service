@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net"
 
+	mygrpc "github.com/pedroxer/resource-service/internal/grpc"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 )
@@ -14,9 +15,9 @@ type App struct {
 	port       int
 }
 
-func NewApp(log *log.Logger, port int) *App {
+func NewApp(log *log.Logger, port int, workplaceSerivce mygrpc.WorkplaceService) *App {
 	server := grpc.NewServer()
-
+	mygrpc.Register(server, nil, workplaceSerivce, nil)
 	return &App{
 		logger:     log,
 		grpcServer: server,

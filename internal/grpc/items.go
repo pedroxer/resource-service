@@ -12,18 +12,18 @@ import (
 )
 
 type ItemService interface {
-	GetItems(itemType, name string, conditionId, workplaceId int64, isAvailable bool, page, pageSize int64) ([]models.Item, int64, error)
-	GetItemById(id int64) (models.Item, error)
-	CreateItem(item *models.Item) (int64, error)
-	UpdateItem(item *models.Item) (models.Item, error)
-	DeleteItem(id int64) error
+	GetItems(ctx context.Context, itemType, name string, conditionId, workplaceId int64, page, pageSize int64) ([]models.Item, int64, error)
+	GetItemById(ctx context.Context, id int64) (models.Item, error)
+	CreateItem(ctx context.Context, item *models.Item) (int64, error)
+	UpdateItem(ctx context.Context, item *models.Item) (models.Item, error)
+	DeleteItem(ctx context.Context, id int64) error
 }
 
 func (s *serverAPI) GetItems(ctx context.Context, req *proto_gen.GetItemsRequest) (*proto_gen.GetItemsResponse, error) {
 	if req.GetPage() == 0 {
 		req.Page = 1
 	}
-	items, amount, err := s.items.GetItems(req.Type, req.Name, req.ConditionId, req.WorkplaceId, req.IsAvailable, req.Page, utills.PageSize)
+	items, amount, err := s.items.GetItems(ctx, req.Type, req.Name, req.ConditionId, req.WorkplaceId, req.Page, utills.PageSize)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -36,8 +36,6 @@ func (s *serverAPI) GetItems(ctx context.Context, req *proto_gen.GetItemsRequest
 			Name:        item.Name,
 			Condition:   item.Condition,
 			WorkplaceId: item.WorkplaceId,
-			Quantity:    item.Quantity,
-			IsAvailable: item.IsAvailable,
 			CreatedAt:   timestamppb.New(item.CreatedAt),
 			UpdatedAt:   timestamppb.New(item.UpdatedAt),
 		})
@@ -52,7 +50,7 @@ func (s *serverAPI) GetItemById(ctx context.Context, req *proto_gen.GetItemByIdR
 	if req.Id == 0 {
 		return nil, status.Error(codes.InvalidArgument, "id is required")
 	}
-	item, err := s.items.GetItemById(req.Id)
+	item, err := s.items.GetItemById(ctx, req.Id)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -61,9 +59,7 @@ func (s *serverAPI) GetItemById(ctx context.Context, req *proto_gen.GetItemByIdR
 		Type:        item.Type,
 		Name:        item.Name,
 		Condition:   item.Condition,
-		WorkplaceId: item.WorkplaceId,
-		Quantity:    item.Quantity,
-		IsAvailable: item.IsAvailable}, nil
+		WorkplaceId: item.WorkplaceId}, nil
 }
 
 func (s *serverAPI) CreateItem(ctx context.Context, req *proto_gen.CreateItemRequest) (*proto_gen.Item, error) {
@@ -72,10 +68,8 @@ func (s *serverAPI) CreateItem(ctx context.Context, req *proto_gen.CreateItemReq
 		Name:        req.Name,
 		Condition:   utills.IdsToConditions[req.ConditionId],
 		WorkplaceId: req.WorkplaceId,
-		Quantity:    req.Quantity,
-		IsAvailable: req.IsAvailable,
 	}
-	id, err := s.items.CreateItem(&item)
+	id, err := s.items.CreateItem(ctx, &item)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -85,8 +79,6 @@ func (s *serverAPI) CreateItem(ctx context.Context, req *proto_gen.CreateItemReq
 		Name:        item.Name,
 		Condition:   item.Condition,
 		WorkplaceId: item.WorkplaceId,
-		Quantity:    item.Quantity,
-		IsAvailable: item.IsAvailable,
 		CreatedAt:   timestamppb.New(time.Now()),
 		UpdatedAt:   timestamppb.New(time.Now()),
 	}, nil
@@ -99,10 +91,8 @@ func (s *serverAPI) UpdateItem(ctx context.Context, req *proto_gen.UpdateItemReq
 		Name:        req.Name,
 		Condition:   utills.IdsToConditions[req.ConditionId],
 		WorkplaceId: req.WorkplaceId,
-		Quantity:    req.Quantity,
-		IsAvailable: req.IsAvailable,
 	}
-	resp, err := s.items.UpdateItem(&item)
+	resp, err := s.items.UpdateItem(ctx, &item)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -112,8 +102,6 @@ func (s *serverAPI) UpdateItem(ctx context.Context, req *proto_gen.UpdateItemReq
 		Name:        resp.Name,
 		Condition:   resp.Condition,
 		WorkplaceId: resp.WorkplaceId,
-		Quantity:    resp.Quantity,
-		IsAvailable: resp.IsAvailable,
 		CreatedAt:   timestamppb.New(resp.CreatedAt),
 		UpdatedAt:   timestamppb.New(resp.UpdatedAt),
 	}, nil
@@ -123,7 +111,7 @@ func (s *serverAPI) DeleteItem(ctx context.Context, req *proto_gen.DeleteItemReq
 	if req.Id == 0 {
 		return nil, status.Error(codes.InvalidArgument, "id is required")
 	}
-	err := s.items.DeleteItem(req.Id)
+	err := s.items.DeleteItem(ctx, req.Id)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

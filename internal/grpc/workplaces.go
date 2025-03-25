@@ -12,19 +12,19 @@ import (
 )
 
 type WorkplaceService interface {
-	GetWorkplaces(zone, floor, workplaceType string, capacity int64, isAvailable bool, page, pageSize int64) ([]models.Workplace, int64, error)
-	GetWorkplacesById(id int64) (models.Workplace, error)
-	CreateWorkplace(workplace models.Workplace) (models.Workplace, error)
-	UpdateWorkplace(workplace models.Workplace) (models.Workplace, error)
-	DeleteWorkplace(id int64) error
-	CheckWorkplaceAvailability(id int64) (bool, []models.TimeSlot, error)
+	GetWorkplaces(ctx context.Context, zone, workplaceType string, floor, capacity int64, isAvailable bool, page, pageSize int64) ([]models.Workplace, int64, error)
+	GetWorkplacesById(ctx context.Context, id int64) (models.Workplace, error)
+	GetWorkplaceByUniqueTag(ctx context.Context, uniqueTag string) (models.Workplace, error)
+	CreateWorkplace(ctx context.Context, workplace models.Workplace) (models.Workplace, error)
+	UpdateWorkplace(ctx context.Context, workplace models.Workplace) (models.Workplace, error)
+	DeleteWorkplace(ctx context.Context, id int64) error
 }
 
 func (s *serverAPI) GetWorkplaces(ctx context.Context, req *proto_gen.GetWorkplacesRequest) (*proto_gen.GetWorkplacesResponse, error) {
 	if req.GetPage() == 0 {
 		req.Page = 1
 	}
-	workplaces, amount, err := s.workplaces.GetWorkplaces(req.Zone, req.Floor, req.Type, req.Capacity, req.IsAvailable, req.Page, utills.PageSize)
+	workplaces, amount, err := s.workplaces.GetWorkplaces(ctx, req.Zone, req.Type, req.Floor, req.Capacity, req.IsAvailable, req.Page, utills.PageSize)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -34,20 +34,31 @@ func (s *serverAPI) GetWorkplaces(ctx context.Context, req *proto_gen.GetWorkpla
 		response.Workplaces = append(response.Workplaces, castServiceWorkplaceToProto(workplace))
 	}
 	response.PageSize = utills.PageSize
-	response.TotalCount = amount / utills.PageSize
+	response.TotalCount = amount/utills.PageSize + 1
 	response.Page = req.Page
 	return response, nil
 }
 
 func (s *serverAPI) GetWorkplaceById(ctx context.Context, req *proto_gen.GetWorkplaceByIdRequest) (*proto_gen.Workplace, error) {
-	workplace, err := s.workplaces.GetWorkplacesById(req.Id)
+	workplace, err := s.workplaces.GetWorkplacesById(ctx, req.Id)
+	if err != nil {
+		return nil, status.Error(codes.Internal, err.Error())
+	}
+	return castServiceWorkplaceToProto(workplace), nil
+}
+
+func (s *serverAPI) GetWorkplaceByUniqueTag(ctx context.Context, req *proto_gen.GetWorkplaceByUniqueTagRequest) (*proto_gen.Workplace, error) {
+	if req.GetUniqueTag() == "" {
+		return nil, status.Error(codes.InvalidArgument, "unique tag is required")
+	}
+	workplace, err := s.workplaces.GetWorkplaceByUniqueTag(ctx, req.UniqueTag)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	return castServiceWorkplaceToProto(workplace), nil
 }
 func (s *serverAPI) CreateWorkplace(ctx context.Context, req *proto_gen.CreateWorkplaceRequest) (*proto_gen.Workplace, error) {
-	workplace, err := s.workplaces.CreateWorkplace(models.Workplace{
+	workplace, err := s.workplaces.CreateWorkplace(ctx, models.Workplace{
 		Address:           req.Address,
 		Zone:              req.Zone,
 		Floor:             req.Floor,
@@ -59,7 +70,6 @@ func (s *serverAPI) CreateWorkplace(ctx context.Context, req *proto_gen.CreateWo
 		CreatedAt:         time.Now(),
 		UpdatedAt:         time.Now(),
 		MaintenanceStatus: req.MaintenanceStatus,
-		UniqueTag:         req.UniqueTag,
 	})
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -71,7 +81,7 @@ func (s *serverAPI) UpdateWorkplace(ctx context.Context, req *proto_gen.UpdateWo
 	if req.GetId() == 0 {
 		return nil, status.Error(codes.InvalidArgument, "id is required")
 	}
-	workplace, err := s.workplaces.UpdateWorkplace(models.Workplace{
+	workplace, err := s.workplaces.UpdateWorkplace(ctx, models.Workplace{
 		Id:                req.Id,
 		Address:           req.Address,
 		Zone:              req.Zone,
@@ -83,7 +93,6 @@ func (s *serverAPI) UpdateWorkplace(ctx context.Context, req *proto_gen.UpdateWo
 		IsAvailable:       req.IsAvailable,
 		UpdatedAt:         time.Now(),
 		MaintenanceStatus: req.MaintenanceStatus,
-		UniqueTag:         req.UniqueTag,
 	})
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
@@ -95,31 +104,11 @@ func (s *serverAPI) DeleteWorkplace(ctx context.Context, req *proto_gen.DeleteWo
 	if req.Id == 0 {
 		return nil, status.Error(codes.InvalidArgument, "id is required")
 	}
-	err := s.workplaces.DeleteWorkplace(req.Id)
+	err := s.workplaces.DeleteWorkplace(ctx, req.Id)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	return &proto_gen.DeleteWorkplaceResponse{Success: true}, nil
-}
-func (s *serverAPI) CheckWorkplaceAvailability(ctx context.Context, req *proto_gen.CheckWorkplaceAvailabilityRequest) (*proto_gen.WorkplaceAvailabilityResponse, error) {
-	if req.GetId() == 0 {
-		return nil, status.Error(codes.InvalidArgument, "id is required")
-	}
-	available, timeSlots, err := s.workplaces.CheckWorkplaceAvailability(req.Id)
-	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
-	}
-	result := new(proto_gen.WorkplaceAvailabilityResponse)
-	result.IsAvailable = available
-	result.UnavailableSlots = make([]*proto_gen.TimeSlot, 0)
-	for _, timeSlot := range timeSlots {
-		result.UnavailableSlots = append(result.UnavailableSlots, &proto_gen.TimeSlot{
-			StartTime: timestamppb.New(timeSlot.From),
-			EndTime:   timestamppb.New(timeSlot.To),
-			Reason:    timeSlot.Reason,
-		})
-	}
-	return result, nil
 }
 
 func castServiceWorkplaceToProto(workplace models.Workplace) *proto_gen.Workplace {
@@ -145,8 +134,6 @@ func castServiceWorkplaceToProto(workplace models.Workplace) *proto_gen.Workplac
 			Name:        item.Name,
 			Condition:   item.Condition,
 			WorkplaceId: item.WorkplaceId,
-			Quantity:    item.Quantity,
-			IsAvailable: item.IsAvailable,
 			CreatedAt:   timestamppb.New(item.CreatedAt),
 			UpdatedAt:   timestamppb.New(item.UpdatedAt),
 		})

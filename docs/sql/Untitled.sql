@@ -7,7 +7,11 @@ CREATE TABLE resource_service."workplace" (
   "type" varchar NOT NULL,
   "capacity" int NOT NULL,
   "description" text,
-  "is_available" boolean DEFAULT true
+  "is_available" boolean DEFAULT true,
+  "maintainance_status" varchar,
+  "created_at" timestamp NOT NULL,
+  "updated_at" timestamp NOT NULL,
+"unique_tag" varchar UNIQUE NOT NULL
 );
 
 CREATE TABLE resource_service."items" (

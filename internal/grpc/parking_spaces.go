@@ -12,18 +12,18 @@ import (
 )
 
 type ParkingService interface {
-	GetParkingSpaces(location, spaceType string, isAvailable bool, page, pageSize int64) ([]models.ParkingPlace, int64, error)
-	GetParkingSpaceById(id int64) (models.ParkingPlace, error)
-	CreateParkingSpace(parkingSpace models.ParkingPlace) (models.ParkingPlace, error)
-	UpdateParkingSpace(parkingSpace models.ParkingPlace) (models.ParkingPlace, error)
-	DeleteParkingSpace(id int64) error
+	GetParkingSpaces(ctx context.Context, location, spaceType string, isAvailable bool, page, pageSize int64) ([]models.ParkingPlace, int64, error)
+	GetParkingSpaceById(ctx context.Context, id int64) (models.ParkingPlace, error)
+	CreateParkingSpace(ctx context.Context, parkingSpace models.ParkingPlace) (models.ParkingPlace, error)
+	UpdateParkingSpace(ctx context.Context, parkingSpace models.ParkingPlace) (models.ParkingPlace, error)
+	DeleteParkingSpace(ctx context.Context, id int64) error
 }
 
 func (s *serverAPI) GetParkingSpaces(ctx context.Context, req *proto_gen.GetParkingSpacesRequest) (*proto_gen.GetParkingSpacesResponse, error) {
 	if req.GetPage() == 0 {
 		req.Page = 1
 	}
-	parkingSpaces, amount, err := s.parkings.GetParkingSpaces(req.Location, req.Type, req.IsAvailable, req.Page, utills.PageSize)
+	parkingSpaces, amount, err := s.parkings.GetParkingSpaces(ctx, req.Location, req.Type, req.IsAvailable, req.Page, utills.PageSize)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -42,7 +42,7 @@ func (s *serverAPI) GetParkingSpaceById(ctx context.Context, req *proto_gen.GetP
 	if req.GetId() == 0 {
 		return nil, status.Error(codes.InvalidArgument, "id is required")
 	}
-	parkingSpace, err := s.parkings.GetParkingSpaceById(req.Id)
+	parkingSpace, err := s.parkings.GetParkingSpaceById(ctx, req.Id)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -50,7 +50,7 @@ func (s *serverAPI) GetParkingSpaceById(ctx context.Context, req *proto_gen.GetP
 }
 
 func (s *serverAPI) CreateParkingSpace(ctx context.Context, req *proto_gen.CreateParkingSpaceRequest) (*proto_gen.ParkingSpace, error) {
-	parkingSpace, err := s.parkings.CreateParkingSpace(models.ParkingPlace{
+	parkingSpace, err := s.parkings.CreateParkingSpace(ctx, models.ParkingPlace{
 		Number:      req.Number,
 		Location:    req.Location,
 		Type:        req.Type,
@@ -69,7 +69,7 @@ func (s *serverAPI) UpdateParkingSpace(ctx context.Context, req *proto_gen.Updat
 	if req.GetId() == 0 {
 		return nil, status.Error(codes.InvalidArgument, "id is required")
 	}
-	parkingSpace, err := s.parkings.UpdateParkingSpace(models.ParkingPlace{
+	parkingSpace, err := s.parkings.UpdateParkingSpace(ctx, models.ParkingPlace{
 		Id:          req.Id,
 		Number:      req.Number,
 		Location:    req.Location,
@@ -87,7 +87,7 @@ func (s *serverAPI) DeleteParkingSpace(ctx context.Context, req *proto_gen.Delet
 	if req.GetId() == 0 {
 		return nil, status.Error(codes.InvalidArgument, "id is required")
 	}
-	err := s.parkings.DeleteParkingSpace(req.Id)
+	err := s.parkings.DeleteParkingSpace(ctx, req.Id)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
