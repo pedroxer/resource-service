@@ -7,7 +7,11 @@ CREATE TABLE resource_service."workplace" (
   "type" varchar NOT NULL,
   "capacity" int NOT NULL,
   "description" text,
-  "is_available" boolean DEFAULT true
+  "is_available" boolean DEFAULT true,
+  "maintainance_status" varchar,
+  "created_at" timestamp NOT NULL,
+  "updated_at" timestamp NOT NULL,
+"unique_tag" varchar UNIQUE NOT NULL
 );
 
 CREATE TABLE resource_service."items" (
@@ -32,9 +36,10 @@ Create table resource_service."parking_spaces"(
   "address" varchar NOT NULL,
   "zone" varchar NOT NULL,
   "number" int NOT NULL,
-  "floor" varchar,
   "type" VARCHAR not null,
-  "is_available" boolean DEFAULT true
+  "is_available" boolean DEFAULT true,
+    "created_at" timestamp NOT NULL default now(),
+    "updated_at" timestamp NOT NULL default now()
 );
 
 CREATE INDEX idx_workplace_zone ON resource_service.workplace(zone);

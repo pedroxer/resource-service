@@ -25,17 +25,16 @@ type ResourceServiceClient interface {
 	// Методы для управления рабочими местами
 	GetWorkplaces(ctx context.Context, in *GetWorkplacesRequest, opts ...grpc.CallOption) (*GetWorkplacesResponse, error)
 	GetWorkplaceById(ctx context.Context, in *GetWorkplaceByIdRequest, opts ...grpc.CallOption) (*Workplace, error)
+	GetWorkplaceByUniqueTag(ctx context.Context, in *GetWorkplaceByUniqueTagRequest, opts ...grpc.CallOption) (*Workplace, error)
 	CreateWorkplace(ctx context.Context, in *CreateWorkplaceRequest, opts ...grpc.CallOption) (*Workplace, error)
 	UpdateWorkplace(ctx context.Context, in *UpdateWorkplaceRequest, opts ...grpc.CallOption) (*Workplace, error)
 	DeleteWorkplace(ctx context.Context, in *DeleteWorkplaceRequest, opts ...grpc.CallOption) (*DeleteWorkplaceResponse, error)
-	CheckWorkplaceAvailability(ctx context.Context, in *CheckWorkplaceAvailabilityRequest, opts ...grpc.CallOption) (*WorkplaceAvailabilityResponse, error)
 	// Методы для управления парковочными местами
 	GetParkingSpaces(ctx context.Context, in *GetParkingSpacesRequest, opts ...grpc.CallOption) (*GetParkingSpacesResponse, error)
 	GetParkingSpaceById(ctx context.Context, in *GetParkingSpaceByIdRequest, opts ...grpc.CallOption) (*ParkingSpace, error)
 	CreateParkingSpace(ctx context.Context, in *CreateParkingSpaceRequest, opts ...grpc.CallOption) (*ParkingSpace, error)
 	UpdateParkingSpace(ctx context.Context, in *UpdateParkingSpaceRequest, opts ...grpc.CallOption) (*ParkingSpace, error)
 	DeleteParkingSpace(ctx context.Context, in *DeleteParkingSpaceRequest, opts ...grpc.CallOption) (*DeleteParkingSpaceResponse, error)
-	CheckParkingSpaceAvailability(ctx context.Context, in *CheckParkingSpaceAvailabilityRequest, opts ...grpc.CallOption) (*ParkingSpaceAvailabilityResponse, error)
 	// Методы для управления предметами
 	GetItems(ctx context.Context, in *GetItemsRequest, opts ...grpc.CallOption) (*GetItemsResponse, error)
 	GetItemById(ctx context.Context, in *GetItemByIdRequest, opts ...grpc.CallOption) (*Item, error)
@@ -71,6 +70,15 @@ func (c *resourceServiceClient) GetWorkplaceById(ctx context.Context, in *GetWor
 	return out, nil
 }
 
+func (c *resourceServiceClient) GetWorkplaceByUniqueTag(ctx context.Context, in *GetWorkplaceByUniqueTagRequest, opts ...grpc.CallOption) (*Workplace, error) {
+	out := new(Workplace)
+	err := c.cc.Invoke(ctx, "/ResourceService.ResourceService/GetWorkplaceByUniqueTag", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *resourceServiceClient) CreateWorkplace(ctx context.Context, in *CreateWorkplaceRequest, opts ...grpc.CallOption) (*Workplace, error) {
 	out := new(Workplace)
 	err := c.cc.Invoke(ctx, "/ResourceService.ResourceService/CreateWorkplace", in, out, opts...)
@@ -92,15 +100,6 @@ func (c *resourceServiceClient) UpdateWorkplace(ctx context.Context, in *UpdateW
 func (c *resourceServiceClient) DeleteWorkplace(ctx context.Context, in *DeleteWorkplaceRequest, opts ...grpc.CallOption) (*DeleteWorkplaceResponse, error) {
 	out := new(DeleteWorkplaceResponse)
 	err := c.cc.Invoke(ctx, "/ResourceService.ResourceService/DeleteWorkplace", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *resourceServiceClient) CheckWorkplaceAvailability(ctx context.Context, in *CheckWorkplaceAvailabilityRequest, opts ...grpc.CallOption) (*WorkplaceAvailabilityResponse, error) {
-	out := new(WorkplaceAvailabilityResponse)
-	err := c.cc.Invoke(ctx, "/ResourceService.ResourceService/CheckWorkplaceAvailability", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -146,15 +145,6 @@ func (c *resourceServiceClient) UpdateParkingSpace(ctx context.Context, in *Upda
 func (c *resourceServiceClient) DeleteParkingSpace(ctx context.Context, in *DeleteParkingSpaceRequest, opts ...grpc.CallOption) (*DeleteParkingSpaceResponse, error) {
 	out := new(DeleteParkingSpaceResponse)
 	err := c.cc.Invoke(ctx, "/ResourceService.ResourceService/DeleteParkingSpace", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *resourceServiceClient) CheckParkingSpaceAvailability(ctx context.Context, in *CheckParkingSpaceAvailabilityRequest, opts ...grpc.CallOption) (*ParkingSpaceAvailabilityResponse, error) {
-	out := new(ParkingSpaceAvailabilityResponse)
-	err := c.cc.Invoke(ctx, "/ResourceService.ResourceService/CheckParkingSpaceAvailability", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -222,17 +212,16 @@ type ResourceServiceServer interface {
 	// Методы для управления рабочими местами
 	GetWorkplaces(context.Context, *GetWorkplacesRequest) (*GetWorkplacesResponse, error)
 	GetWorkplaceById(context.Context, *GetWorkplaceByIdRequest) (*Workplace, error)
+	GetWorkplaceByUniqueTag(context.Context, *GetWorkplaceByUniqueTagRequest) (*Workplace, error)
 	CreateWorkplace(context.Context, *CreateWorkplaceRequest) (*Workplace, error)
 	UpdateWorkplace(context.Context, *UpdateWorkplaceRequest) (*Workplace, error)
 	DeleteWorkplace(context.Context, *DeleteWorkplaceRequest) (*DeleteWorkplaceResponse, error)
-	CheckWorkplaceAvailability(context.Context, *CheckWorkplaceAvailabilityRequest) (*WorkplaceAvailabilityResponse, error)
 	// Методы для управления парковочными местами
 	GetParkingSpaces(context.Context, *GetParkingSpacesRequest) (*GetParkingSpacesResponse, error)
 	GetParkingSpaceById(context.Context, *GetParkingSpaceByIdRequest) (*ParkingSpace, error)
 	CreateParkingSpace(context.Context, *CreateParkingSpaceRequest) (*ParkingSpace, error)
 	UpdateParkingSpace(context.Context, *UpdateParkingSpaceRequest) (*ParkingSpace, error)
 	DeleteParkingSpace(context.Context, *DeleteParkingSpaceRequest) (*DeleteParkingSpaceResponse, error)
-	CheckParkingSpaceAvailability(context.Context, *CheckParkingSpaceAvailabilityRequest) (*ParkingSpaceAvailabilityResponse, error)
 	// Методы для управления предметами
 	GetItems(context.Context, *GetItemsRequest) (*GetItemsResponse, error)
 	GetItemById(context.Context, *GetItemByIdRequest) (*Item, error)
@@ -253,6 +242,9 @@ func (UnimplementedResourceServiceServer) GetWorkplaces(context.Context, *GetWor
 func (UnimplementedResourceServiceServer) GetWorkplaceById(context.Context, *GetWorkplaceByIdRequest) (*Workplace, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetWorkplaceById not implemented")
 }
+func (UnimplementedResourceServiceServer) GetWorkplaceByUniqueTag(context.Context, *GetWorkplaceByUniqueTagRequest) (*Workplace, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetWorkplaceByUniqueTag not implemented")
+}
 func (UnimplementedResourceServiceServer) CreateWorkplace(context.Context, *CreateWorkplaceRequest) (*Workplace, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateWorkplace not implemented")
 }
@@ -261,9 +253,6 @@ func (UnimplementedResourceServiceServer) UpdateWorkplace(context.Context, *Upda
 }
 func (UnimplementedResourceServiceServer) DeleteWorkplace(context.Context, *DeleteWorkplaceRequest) (*DeleteWorkplaceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteWorkplace not implemented")
-}
-func (UnimplementedResourceServiceServer) CheckWorkplaceAvailability(context.Context, *CheckWorkplaceAvailabilityRequest) (*WorkplaceAvailabilityResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CheckWorkplaceAvailability not implemented")
 }
 func (UnimplementedResourceServiceServer) GetParkingSpaces(context.Context, *GetParkingSpacesRequest) (*GetParkingSpacesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetParkingSpaces not implemented")
@@ -279,9 +268,6 @@ func (UnimplementedResourceServiceServer) UpdateParkingSpace(context.Context, *U
 }
 func (UnimplementedResourceServiceServer) DeleteParkingSpace(context.Context, *DeleteParkingSpaceRequest) (*DeleteParkingSpaceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteParkingSpace not implemented")
-}
-func (UnimplementedResourceServiceServer) CheckParkingSpaceAvailability(context.Context, *CheckParkingSpaceAvailabilityRequest) (*ParkingSpaceAvailabilityResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CheckParkingSpaceAvailability not implemented")
 }
 func (UnimplementedResourceServiceServer) GetItems(context.Context, *GetItemsRequest) (*GetItemsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetItems not implemented")
@@ -350,6 +336,24 @@ func _ResourceService_GetWorkplaceById_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ResourceService_GetWorkplaceByUniqueTag_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetWorkplaceByUniqueTagRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ResourceServiceServer).GetWorkplaceByUniqueTag(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/ResourceService.ResourceService/GetWorkplaceByUniqueTag",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ResourceServiceServer).GetWorkplaceByUniqueTag(ctx, req.(*GetWorkplaceByUniqueTagRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ResourceService_CreateWorkplace_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(CreateWorkplaceRequest)
 	if err := dec(in); err != nil {
@@ -400,24 +404,6 @@ func _ResourceService_DeleteWorkplace_Handler(srv interface{}, ctx context.Conte
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ResourceServiceServer).DeleteWorkplace(ctx, req.(*DeleteWorkplaceRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ResourceService_CheckWorkplaceAvailability_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CheckWorkplaceAvailabilityRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ResourceServiceServer).CheckWorkplaceAvailability(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/ResourceService.ResourceService/CheckWorkplaceAvailability",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ResourceServiceServer).CheckWorkplaceAvailability(ctx, req.(*CheckWorkplaceAvailabilityRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -508,24 +494,6 @@ func _ResourceService_DeleteParkingSpace_Handler(srv interface{}, ctx context.Co
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ResourceServiceServer).DeleteParkingSpace(ctx, req.(*DeleteParkingSpaceRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ResourceService_CheckParkingSpaceAvailability_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CheckParkingSpaceAvailabilityRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ResourceServiceServer).CheckParkingSpaceAvailability(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/ResourceService.ResourceService/CheckParkingSpaceAvailability",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ResourceServiceServer).CheckParkingSpaceAvailability(ctx, req.(*CheckParkingSpaceAvailabilityRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -654,6 +622,10 @@ var ResourceService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ResourceService_GetWorkplaceById_Handler,
 		},
 		{
+			MethodName: "GetWorkplaceByUniqueTag",
+			Handler:    _ResourceService_GetWorkplaceByUniqueTag_Handler,
+		},
+		{
 			MethodName: "CreateWorkplace",
 			Handler:    _ResourceService_CreateWorkplace_Handler,
 		},
@@ -664,10 +636,6 @@ var ResourceService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteWorkplace",
 			Handler:    _ResourceService_DeleteWorkplace_Handler,
-		},
-		{
-			MethodName: "CheckWorkplaceAvailability",
-			Handler:    _ResourceService_CheckWorkplaceAvailability_Handler,
 		},
 		{
 			MethodName: "GetParkingSpaces",
@@ -688,10 +656,6 @@ var ResourceService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteParkingSpace",
 			Handler:    _ResourceService_DeleteParkingSpace_Handler,
-		},
-		{
-			MethodName: "CheckParkingSpaceAvailability",
-			Handler:    _ResourceService_CheckParkingSpaceAvailability_Handler,
 		},
 		{
 			MethodName: "GetItems",
