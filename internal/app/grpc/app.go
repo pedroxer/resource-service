@@ -15,9 +15,9 @@ type App struct {
 	port       int
 }
 
-func NewApp(log *log.Logger, port int, workplaceSerivce mygrpc.WorkplaceService) *App {
+func NewApp(log *log.Logger, port int, workplaceSerivce mygrpc.WorkplaceService, itemService mygrpc.ItemService) *App {
 	server := grpc.NewServer()
-	mygrpc.Register(server, nil, workplaceSerivce, nil)
+	mygrpc.Register(server, log, itemService, workplaceSerivce, nil)
 	return &App{
 		logger:     log,
 		grpcServer: server,

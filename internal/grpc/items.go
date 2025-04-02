@@ -14,8 +14,8 @@ import (
 type ItemService interface {
 	GetItems(ctx context.Context, itemType, name string, conditionId, workplaceId int64, page, pageSize int64) ([]models.Item, int64, error)
 	GetItemById(ctx context.Context, id int64) (models.Item, error)
-	CreateItem(ctx context.Context, item *models.Item) (int64, error)
-	UpdateItem(ctx context.Context, item *models.Item) (models.Item, error)
+	CreateItem(ctx context.Context, item models.Item) (int64, error)
+	UpdateItem(ctx context.Context, item models.Item) (models.Item, error)
 	DeleteItem(ctx context.Context, id int64) error
 }
 
@@ -41,7 +41,7 @@ func (s *serverAPI) GetItems(ctx context.Context, req *proto_gen.GetItemsRequest
 		})
 	}
 	response.PageSize = utills.PageSize
-	response.TotalCount = amount / utills.PageSize
+	response.TotalCount = amount/utills.PageSize + 1
 	response.Page = req.Page
 	return response, nil
 }
@@ -63,13 +63,17 @@ func (s *serverAPI) GetItemById(ctx context.Context, req *proto_gen.GetItemByIdR
 }
 
 func (s *serverAPI) CreateItem(ctx context.Context, req *proto_gen.CreateItemRequest) (*proto_gen.Item, error) {
+	if req.ConditionId == 0 {
+		s.logger.Warn("condition id is required")
+		return nil, status.Error(codes.InvalidArgument, "condition_id is required")
+	}
 	item := models.Item{
 		Type:        req.Type,
 		Name:        req.Name,
 		Condition:   utills.IdsToConditions[req.ConditionId],
 		WorkplaceId: req.WorkplaceId,
 	}
-	id, err := s.items.CreateItem(ctx, &item)
+	id, err := s.items.CreateItem(ctx, item)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
@@ -92,7 +96,7 @@ func (s *serverAPI) UpdateItem(ctx context.Context, req *proto_gen.UpdateItemReq
 		Condition:   utills.IdsToConditions[req.ConditionId],
 		WorkplaceId: req.WorkplaceId,
 	}
-	resp, err := s.items.UpdateItem(ctx, &item)
+	resp, err := s.items.UpdateItem(ctx, item)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

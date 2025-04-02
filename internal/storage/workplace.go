@@ -9,7 +9,7 @@ import (
 	"time"
 )
 
-var columnsMap = map[string]SearchField{
+var wrokplaceColumnsMap = map[string]SearchField{
 	"id":                  {NameWhere: "workplace.id", NameOrder: "workplace.id"},
 	"address":             {NameWhere: "workplace.address", NameOrder: "workplace.address"},
 	"zone":                {NameWhere: "workplace.zone", NameOrder: "workplace.zone"},
@@ -46,7 +46,7 @@ func (s *Storage) GetWorkplaces(ctx context.Context, filters []Field, page int64
 	selectQuery := "SELECT " + strings.Join(workplacesFileds, ", ") + from
 
 	countQuery := `SELECT count(*) FROM (` + selectQuery
-	where, err := GenerateSearch(columnsMap, filters)
+	where, err := GenerateSearch(wrokplaceColumnsMap, filters)
 	if err != nil {
 		s.logger.Warn(err.Error())
 		return nil, 0, err
@@ -212,7 +212,7 @@ func (s *Storage) CreateWorkplace(ctx context.Context, workplace models.Workplac
 func (s *Storage) UpdateWorkplace(ctx context.Context, id int64, updateFields []Field) (models.Workplace, error) {
 
 	updateQuery := `UPDATE resource_service.workplace SET `
-	updateColumns, err := GenerateUpdates(columnsMap, updateFields)
+	updateColumns, err := GenerateUpdates(wrokplaceColumnsMap, updateFields)
 	if err != nil {
 		return models.Workplace{}, err
 	}
