@@ -35,7 +35,6 @@ type ResourceServiceClient interface {
 	CreateParkingSpace(ctx context.Context, in *CreateParkingSpaceRequest, opts ...grpc.CallOption) (*ParkingSpace, error)
 	UpdateParkingSpace(ctx context.Context, in *UpdateParkingSpaceRequest, opts ...grpc.CallOption) (*ParkingSpace, error)
 	DeleteParkingSpace(ctx context.Context, in *DeleteParkingSpaceRequest, opts ...grpc.CallOption) (*DeleteParkingSpaceResponse, error)
-	CheckParkingSpaceAvailability(ctx context.Context, in *CheckParkingSpaceAvailabilityRequest, opts ...grpc.CallOption) (*ParkingSpaceAvailabilityResponse, error)
 	// Методы для управления предметами
 	GetItems(ctx context.Context, in *GetItemsRequest, opts ...grpc.CallOption) (*GetItemsResponse, error)
 	GetItemById(ctx context.Context, in *GetItemByIdRequest, opts ...grpc.CallOption) (*Item, error)
@@ -152,15 +151,6 @@ func (c *resourceServiceClient) DeleteParkingSpace(ctx context.Context, in *Dele
 	return out, nil
 }
 
-func (c *resourceServiceClient) CheckParkingSpaceAvailability(ctx context.Context, in *CheckParkingSpaceAvailabilityRequest, opts ...grpc.CallOption) (*ParkingSpaceAvailabilityResponse, error) {
-	out := new(ParkingSpaceAvailabilityResponse)
-	err := c.cc.Invoke(ctx, "/ResourceService.ResourceService/CheckParkingSpaceAvailability", in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *resourceServiceClient) GetItems(ctx context.Context, in *GetItemsRequest, opts ...grpc.CallOption) (*GetItemsResponse, error) {
 	out := new(GetItemsResponse)
 	err := c.cc.Invoke(ctx, "/ResourceService.ResourceService/GetItems", in, out, opts...)
@@ -232,7 +222,6 @@ type ResourceServiceServer interface {
 	CreateParkingSpace(context.Context, *CreateParkingSpaceRequest) (*ParkingSpace, error)
 	UpdateParkingSpace(context.Context, *UpdateParkingSpaceRequest) (*ParkingSpace, error)
 	DeleteParkingSpace(context.Context, *DeleteParkingSpaceRequest) (*DeleteParkingSpaceResponse, error)
-	CheckParkingSpaceAvailability(context.Context, *CheckParkingSpaceAvailabilityRequest) (*ParkingSpaceAvailabilityResponse, error)
 	// Методы для управления предметами
 	GetItems(context.Context, *GetItemsRequest) (*GetItemsResponse, error)
 	GetItemById(context.Context, *GetItemByIdRequest) (*Item, error)
@@ -279,9 +268,6 @@ func (UnimplementedResourceServiceServer) UpdateParkingSpace(context.Context, *U
 }
 func (UnimplementedResourceServiceServer) DeleteParkingSpace(context.Context, *DeleteParkingSpaceRequest) (*DeleteParkingSpaceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DeleteParkingSpace not implemented")
-}
-func (UnimplementedResourceServiceServer) CheckParkingSpaceAvailability(context.Context, *CheckParkingSpaceAvailabilityRequest) (*ParkingSpaceAvailabilityResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CheckParkingSpaceAvailability not implemented")
 }
 func (UnimplementedResourceServiceServer) GetItems(context.Context, *GetItemsRequest) (*GetItemsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetItems not implemented")
@@ -512,24 +498,6 @@ func _ResourceService_DeleteParkingSpace_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ResourceService_CheckParkingSpaceAvailability_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CheckParkingSpaceAvailabilityRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ResourceServiceServer).CheckParkingSpaceAvailability(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: "/ResourceService.ResourceService/CheckParkingSpaceAvailability",
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ResourceServiceServer).CheckParkingSpaceAvailability(ctx, req.(*CheckParkingSpaceAvailabilityRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _ResourceService_GetItems_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetItemsRequest)
 	if err := dec(in); err != nil {
@@ -688,10 +656,6 @@ var ResourceService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteParkingSpace",
 			Handler:    _ResourceService_DeleteParkingSpace_Handler,
-		},
-		{
-			MethodName: "CheckParkingSpaceAvailability",
-			Handler:    _ResourceService_CheckParkingSpaceAvailability_Handler,
 		},
 		{
 			MethodName: "GetItems",

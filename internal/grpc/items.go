@@ -89,6 +89,10 @@ func (s *serverAPI) CreateItem(ctx context.Context, req *proto_gen.CreateItemReq
 }
 
 func (s *serverAPI) UpdateItem(ctx context.Context, req *proto_gen.UpdateItemRequest) (*proto_gen.Item, error) {
+	if req.Id == 0 {
+		s.logger.Warn("id is required")
+		return nil, status.Error(codes.InvalidArgument, "id is required")
+	}
 	item := models.Item{
 		Id:          req.Id,
 		Type:        req.Type,

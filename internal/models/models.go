@@ -38,10 +38,10 @@ type TimeSlot struct {
 type ParkingPlace struct {
 	Id          int64
 	Number      int64
-	Location    string
+	Address     string
+	Zone        string
 	Type        string
 	IsAvailable bool
-	Description string
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
