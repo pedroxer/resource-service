@@ -11,7 +11,7 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-func main(){
+func main() {
 	log := setupLogger()
 	data, err := os.ReadFile("./configs/config.json")
 	if err != nil {
@@ -31,14 +31,14 @@ func main(){
 		log.Fatalf("failed connect to db %s", err)
 	}
 	log.Info("connected to db")
-	
+
 	app := app.NewApp(log, cfg.Port, store)
 	if err := app.GRPCSrv.Run(); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func setupLogger()*log.Logger{
+func setupLogger() *log.Logger {
 	log := log.New()
 	log.ReportCaller = true
 	return log
