@@ -8,7 +8,7 @@ RUN go mod download
 
 COPY . .
 
-RUN go build -o resource-service ./cmd/main
+RUN go build -o resource-service ./cmd/main.go
 
 FROM alpine:3.18
 
@@ -16,8 +16,5 @@ WORKDIR /app
 COPY --from=builder /app/resource-service .
 
 EXPOSE 8081
-
-ENV PG_USER=string  \
-    PG_PASS =string
 
 CMD ["./resource-service"]
