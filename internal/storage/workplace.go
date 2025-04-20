@@ -52,8 +52,10 @@ func (s *Storage) GetWorkplaces(ctx context.Context, filters []Field, withItems 
 		return nil, 0, err
 	}
 	var conditions strings.Builder
-	conditions.WriteString(" WHERE")
-	conditions.WriteString(where)
+	if len(filters) != 0 {
+		conditions.WriteString(" WHERE")
+		conditions.WriteString(where)
+	}
 	selectQuery += conditions.String() + GenerateLimits(page, utills.PageSize)
 
 	rows, err := s.db.Query(ctx, selectQuery)

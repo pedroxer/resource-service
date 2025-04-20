@@ -8,7 +8,7 @@ option go_package = "github.com/pedroxer/resource-service/internal/proto_gen";
 import "google/protobuf/timestamp.proto";
 
 service ResourceService {
-  // Методы для управления рабочими местами
+
   rpc GetWorkplaces(GetWorkplacesRequest) returns (GetWorkplacesResponse);
   rpc GetWorkplaceById(GetWorkplaceByIdRequest) returns (Workplace);
   rpc GetWorkplaceByUniqueTag(GetWorkplaceByUniqueTagRequest) returns (Workplace);
@@ -17,7 +17,7 @@ service ResourceService {
   rpc DeleteWorkplace(DeleteWorkplaceRequest) returns (DeleteWorkplaceResponse);
 
 
-  // Методы для управления парковочными местами
+
   rpc GetParkingSpaces(GetParkingSpacesRequest) returns (GetParkingSpacesResponse);
   rpc GetParkingSpaceById(GetParkingSpaceByIdRequest) returns (ParkingSpace);
   rpc CreateParkingSpace(CreateParkingSpaceRequest) returns (ParkingSpace);
@@ -25,7 +25,7 @@ service ResourceService {
   rpc DeleteParkingSpace(DeleteParkingSpaceRequest) returns (DeleteParkingSpaceResponse);
 
 
-  // Методы для управления предметами
+
   rpc GetItems(GetItemsRequest) returns (GetItemsResponse);
   rpc GetItemById(GetItemByIdRequest) returns (Item);
   rpc CreateItem(CreateItemRequest) returns (Item);
@@ -111,11 +111,7 @@ message DeleteWorkplaceResponse {
 }
 
 
-message TimeSlot {
-  google.protobuf.Timestamp start_time = 1;
-  google.protobuf.Timestamp end_time = 2;
-  string reason = 3;
-}
+
 
 // Сообщения для парковочных мест
 message ParkingSpace {

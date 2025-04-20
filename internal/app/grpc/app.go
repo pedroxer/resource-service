@@ -2,6 +2,7 @@ package grpc_app
 
 import (
 	"fmt"
+	"google.golang.org/grpc/reflection"
 	"net"
 
 	mygrpc "github.com/pedroxer/resource-service/internal/grpc"
@@ -18,6 +19,7 @@ type App struct {
 func NewApp(log *log.Logger, port int, workplaceService mygrpc.WorkplaceService, itemService mygrpc.ItemService, parkingSpaceService mygrpc.ParkingService) *App {
 	server := grpc.NewServer()
 	mygrpc.Register(server, log, itemService, workplaceService, parkingSpaceService)
+	reflection.Register(server)
 	return &App{
 		logger:     log,
 		grpcServer: server,
