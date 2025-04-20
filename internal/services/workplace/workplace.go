@@ -101,6 +101,12 @@ func (d DefaultWorkplaceService) CreateWorkplace(ctx context.Context, workplace 
 }
 
 func (d DefaultWorkplaceService) UpdateWorkplace(ctx context.Context, workplace models.Workplace) (models.Workplace, error) {
+	workplaceFromDB, err := d.getter.GetWorkplacesById(ctx, workplace.Id)
+	if err != nil {
+		d.logger.Warn(err.Error())
+		return models.Workplace{}, err
+	}
+
 	updateFields := make([]storage.Field, 0)
 	if workplace.Address != "" {
 		updateFields = append(updateFields, storage.Field{
@@ -132,6 +138,12 @@ func (d DefaultWorkplaceService) UpdateWorkplace(ctx context.Context, workplace 
 			Value: workplace.Type,
 		})
 	}
+	if workplace.IsAvailable != workplaceFromDB.IsAvailable {
+		updateFields = append(updateFields, storage.Field{
+			Name:  "is_available",
+			Value: workplace.IsAvailable,
+		})
+	}
 	if workplace.Capacity != 0 {
 		updateFields = append(updateFields, storage.Field{
 			Name:  "capacity",
@@ -142,12 +154,6 @@ func (d DefaultWorkplaceService) UpdateWorkplace(ctx context.Context, workplace 
 		updateFields = append(updateFields, storage.Field{
 			Name:  "description",
 			Value: workplace.Description,
-		})
-	}
-	if workplace.IsAvailable != false {
-		updateFields = append(updateFields, storage.Field{
-			Name:  "is_available",
-			Value: workplace.IsAvailable,
 		})
 	}
 	if workplace.MaintenanceStatus != "" {

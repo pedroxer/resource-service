@@ -84,6 +84,11 @@ func (d DefaultParkingSpaceService) CreateParkingSpace(ctx context.Context, park
 }
 
 func (d DefaultParkingSpaceService) UpdateParkingSpace(ctx context.Context, parkingSpace models.ParkingPlace) (models.ParkingPlace, error) {
+	parkingSpaceFromDB, err := d.getter.GetParkingLotById(ctx, parkingSpace.Id)
+	if err != nil {
+		d.logger.Warn("error getting space", err.Error())
+		return models.ParkingPlace{}, err
+	}
 	updateFields := make([]storage.Field, 0)
 	if parkingSpace.Address != "" {
 		updateFields = append(updateFields, storage.Field{
@@ -103,14 +108,14 @@ func (d DefaultParkingSpaceService) UpdateParkingSpace(ctx context.Context, park
 			Value: parkingSpace.Type,
 		})
 	}
-	if parkingSpace.IsAvailable {
+	if parkingSpace.IsAvailable != parkingSpaceFromDB.IsAvailable {
 		updateFields = append(updateFields, storage.Field{
 			Name:  "is_available",
 			Value: parkingSpace.IsAvailable,
 		})
 	}
 
-	parkingSpace, err := d.creater.UpdateParkingLot(ctx, parkingSpace.Id, updateFields)
+	parkingSpace, err = d.creater.UpdateParkingLot(ctx, parkingSpace.Id, updateFields)
 	if err != nil {
 		d.logger.Warn("error updating space", err.Error())
 		return models.ParkingPlace{}, err

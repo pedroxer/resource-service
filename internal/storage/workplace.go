@@ -214,17 +214,15 @@ func (s *Storage) CreateWorkplace(ctx context.Context, workplace models.Workplac
 }
 
 func (s *Storage) UpdateWorkplace(ctx context.Context, id int64, updateFields []Field) (models.Workplace, error) {
-
-	updateQuery := `UPDATE resource_service.workplace SET `
-	updateColumns, err := GenerateUpdates(wrokplaceColumnsMap, updateFields)
-	if err != nil {
-		return models.Workplace{}, err
+	var updateQueryBuilder strings.Builder
+	updateQueryBuilder.WriteString("UPDATE resource_service.workplace SET ")
+	for _, field := range updateFields {
+		updateQueryBuilder.WriteString(fmt.Sprintf("%s = '%s' AND ", field.Name, fmt.Sprint(field.Value)))
 	}
-	if len(updateColumns) == 0 {
-		return models.Workplace{}, fmt.Errorf("not enough data to update")
-	}
+	updateQuery := updateQueryBuilder.String()
+	updateQuery = strings.Trim(updateQuery, "AND ")
+	updateQuery += fmt.Sprintf(" WHERE id = %d RETURNING *", id)
 
-	updateQuery += updateColumns + fmt.Sprintf(" WHERE id = %d RETURNING *", id)
 	var result models.Workplace
 	if err := s.db.QueryRow(ctx, updateQuery).Scan(
 		&result.Id,
@@ -237,9 +235,9 @@ func (s *Storage) UpdateWorkplace(ctx context.Context, id int64, updateFields []
 		&result.Description,
 		&result.IsAvailable,
 		&result.MaintenanceStatus,
+		&result.UniqueTag,
 		&result.CreatedAt,
 		&result.UpdatedAt,
-		&result.UniqueTag,
 	); err != nil {
 		s.logger.Warn(err.Error())
 		return models.Workplace{}, err

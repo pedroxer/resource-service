@@ -116,17 +116,14 @@ func (s *Storage) CreateParkingLot(ctx context.Context, parkingSpace models.Park
 }
 
 func (s *Storage) UpdateParkingLot(ctx context.Context, id int64, updateFields []Field) (models.ParkingPlace, error) {
-	updateQuery := `UPDATE resource_service.parking_spaces SET `
-	updateColumns, err := GenerateUpdates(parkingSpaceColumnsMap, updateFields)
-	if err != nil {
-		s.logger.Warn("cannot generate columns", err.Error())
-		return models.ParkingPlace{}, err
+	var updateQueryBuilder strings.Builder
+	updateQueryBuilder.WriteString("UPDATE resource_service.parking_spaces SET ")
+	for _, field := range updateFields {
+		updateQueryBuilder.WriteString(fmt.Sprintf("%s = '%s' AND ", field.Name, fmt.Sprint(field.Value)))
 	}
-	if len(updateColumns) == 0 {
-		s.logger.Warn("not enough data to update")
-		return models.ParkingPlace{}, fmt.Errorf("not enough data to update")
-	}
-	updateQuery += updateColumns + fmt.Sprintf(" WHERE id = %d RETURNING *", id)
+	updateQuery := updateQueryBuilder.String()
+	updateQuery = strings.Trim(updateQuery, "AND ")
+	updateQuery += fmt.Sprintf(" WHERE id = %d RETURNING *", id)
 	var result models.ParkingPlace
 	if err := s.db.QueryRow(ctx, updateQuery).Scan(
 		&result.Id,
