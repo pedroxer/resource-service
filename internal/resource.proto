@@ -58,7 +58,8 @@ message GetWorkplacesRequest {
   string type = 3;
   int64 capacity = 4;
   bool is_available = 5;
-  int64 page = 6;
+  bool with_items = 6;
+  int64 page = 7;
 }
 
 message GetWorkplacesResponse {

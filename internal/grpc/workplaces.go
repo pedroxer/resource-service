@@ -12,7 +12,7 @@ import (
 )
 
 type WorkplaceService interface {
-	GetWorkplaces(ctx context.Context, zone, workplaceType string, floor, capacity int64, isAvailable bool, page, pageSize int64) ([]models.Workplace, int64, error)
+	GetWorkplaces(ctx context.Context, zone, workplaceType string, floor, capacity int64, isAvailable, withItems bool, page, pageSize int64) ([]models.Workplace, int64, error)
 	GetWorkplacesById(ctx context.Context, id int64) (models.Workplace, error)
 	GetWorkplaceByUniqueTag(ctx context.Context, uniqueTag string) (models.Workplace, error)
 	CreateWorkplace(ctx context.Context, workplace models.Workplace) (models.Workplace, error)
@@ -24,7 +24,7 @@ func (s *serverAPI) GetWorkplaces(ctx context.Context, req *proto_gen.GetWorkpla
 	if req.GetPage() == 0 {
 		req.Page = 1
 	}
-	workplaces, amount, err := s.workplaces.GetWorkplaces(ctx, req.Zone, req.Type, req.Floor, req.Capacity, req.IsAvailable, req.Page, utills.PageSize)
+	workplaces, amount, err := s.workplaces.GetWorkplaces(ctx, req.Zone, req.Type, req.Floor, req.Capacity, req.IsAvailable, req.WithItems, req.Page, utills.PageSize)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

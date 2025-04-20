@@ -40,7 +40,7 @@ var workplacesFileds = []string{
 	"workplace.unique_tag",
 }
 
-func (s *Storage) GetWorkplaces(ctx context.Context, filters []Field, page int64) ([]models.Workplace, int64, error) {
+func (s *Storage) GetWorkplaces(ctx context.Context, filters []Field, withItems bool, page int64) ([]models.Workplace, int64, error) {
 
 	from := ` FROM resource_service.workplace`
 	selectQuery := "SELECT " + strings.Join(workplacesFileds, ", ") + from
@@ -91,13 +91,15 @@ func (s *Storage) GetWorkplaces(ctx context.Context, filters []Field, page int64
 	}
 	countQuery += conditions.String()
 	countQuery += ") as cnt"
-	items, err := s.GetItemsByWorkplaceIds(ctx, workplaceIds)
-	if err != nil {
-		s.logger.Warn(err.Error())
-		return nil, 0, err
-	}
-	for i, workplace := range workplaces {
-		workplaces[i].Items = items[workplace.Id]
+	if withItems {
+		items, err := s.GetItemsByWorkplaceIds(ctx, workplaceIds)
+		if err != nil {
+			s.logger.Warn(err.Error())
+			return nil, 0, err
+		}
+		for i, workplace := range workplaces {
+			workplaces[i].Items = items[workplace.Id]
+		}
 	}
 	if err := s.db.QueryRow(ctx, countQuery).Scan(&workplacesCount); err != nil {
 		s.logger.Warn(err.Error())

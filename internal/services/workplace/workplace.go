@@ -9,7 +9,7 @@ import (
 )
 
 type WorkplaceGetter interface {
-	GetWorkplaces(ctx context.Context, filters []storage.Field, page int64) ([]models.Workplace, int64, error)
+	GetWorkplaces(ctx context.Context, filters []storage.Field, withItems bool, page int64) ([]models.Workplace, int64, error)
 	GetWorkplacesById(ctx context.Context, id int64) (models.Workplace, error)
 	GetWorkplaceByUniqueTag(ctx context.Context, uniqueTag string) (models.Workplace, error)
 }
@@ -32,7 +32,7 @@ func NewDefaultWorkplaceService(storage *storage.Storage, logger *log.Logger) *D
 	}
 }
 
-func (d DefaultWorkplaceService) GetWorkplaces(ctx context.Context, zone, workplaceType string, floor int64, capacity int64, isAvailable bool, page, pageSize int64) ([]models.Workplace, int64, error) {
+func (d DefaultWorkplaceService) GetWorkplaces(ctx context.Context, zone, workplaceType string, floor int64, capacity int64, isAvailable, withItems bool, page, pageSize int64) ([]models.Workplace, int64, error) {
 	filters := make([]storage.Field, 0)
 	if zone != "" {
 		filters = append(filters, storage.Field{
@@ -64,7 +64,7 @@ func (d DefaultWorkplaceService) GetWorkplaces(ctx context.Context, zone, workpl
 		Value: isAvailable,
 	})
 
-	workplaces, amount, err := d.getter.GetWorkplaces(ctx, filters, page)
+	workplaces, amount, err := d.getter.GetWorkplaces(ctx, filters, withItems, page)
 	if err != nil {
 		d.logger.Warn(err.Error())
 		return nil, 0, err
