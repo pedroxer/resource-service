@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/pedroxer/resource-service/internal/models"
 	"github.com/pedroxer/resource-service/internal/storage"
+	"github.com/pedroxer/resource-service/internal/utills"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -100,10 +101,10 @@ func (d DefaultItemService) UpdateItem(ctx context.Context, item models.Item) (m
 			Value: item.Name,
 		})
 	}
-	if item.Condition != "" {
+	if conditionId, ok := utills.ConditionsToIds[item.Condition]; ok && item.Condition != "" {
 		updateFields = append(updateFields, storage.Field{
-			Name:  "condition",
-			Value: item.Condition,
+			Name:  "condition_id",
+			Value: conditionId,
 		})
 	}
 	if item.WorkplaceId != 0 {

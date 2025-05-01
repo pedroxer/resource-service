@@ -22,20 +22,17 @@ const _ = grpc.SupportPackageIsVersion7
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ResourceServiceClient interface {
-	// Методы для управления рабочими местами
 	GetWorkplaces(ctx context.Context, in *GetWorkplacesRequest, opts ...grpc.CallOption) (*GetWorkplacesResponse, error)
 	GetWorkplaceById(ctx context.Context, in *GetWorkplaceByIdRequest, opts ...grpc.CallOption) (*Workplace, error)
 	GetWorkplaceByUniqueTag(ctx context.Context, in *GetWorkplaceByUniqueTagRequest, opts ...grpc.CallOption) (*Workplace, error)
 	CreateWorkplace(ctx context.Context, in *CreateWorkplaceRequest, opts ...grpc.CallOption) (*Workplace, error)
 	UpdateWorkplace(ctx context.Context, in *UpdateWorkplaceRequest, opts ...grpc.CallOption) (*Workplace, error)
 	DeleteWorkplace(ctx context.Context, in *DeleteWorkplaceRequest, opts ...grpc.CallOption) (*DeleteWorkplaceResponse, error)
-	// Методы для управления парковочными местами
 	GetParkingSpaces(ctx context.Context, in *GetParkingSpacesRequest, opts ...grpc.CallOption) (*GetParkingSpacesResponse, error)
 	GetParkingSpaceById(ctx context.Context, in *GetParkingSpaceByIdRequest, opts ...grpc.CallOption) (*ParkingSpace, error)
 	CreateParkingSpace(ctx context.Context, in *CreateParkingSpaceRequest, opts ...grpc.CallOption) (*ParkingSpace, error)
 	UpdateParkingSpace(ctx context.Context, in *UpdateParkingSpaceRequest, opts ...grpc.CallOption) (*ParkingSpace, error)
 	DeleteParkingSpace(ctx context.Context, in *DeleteParkingSpaceRequest, opts ...grpc.CallOption) (*DeleteParkingSpaceResponse, error)
-	// Методы для управления предметами
 	GetItems(ctx context.Context, in *GetItemsRequest, opts ...grpc.CallOption) (*GetItemsResponse, error)
 	GetItemById(ctx context.Context, in *GetItemByIdRequest, opts ...grpc.CallOption) (*Item, error)
 	CreateItem(ctx context.Context, in *CreateItemRequest, opts ...grpc.CallOption) (*Item, error)
@@ -209,20 +206,17 @@ func (c *resourceServiceClient) AttachItemToWorkplace(ctx context.Context, in *A
 // All implementations must embed UnimplementedResourceServiceServer
 // for forward compatibility
 type ResourceServiceServer interface {
-	// Методы для управления рабочими местами
 	GetWorkplaces(context.Context, *GetWorkplacesRequest) (*GetWorkplacesResponse, error)
 	GetWorkplaceById(context.Context, *GetWorkplaceByIdRequest) (*Workplace, error)
 	GetWorkplaceByUniqueTag(context.Context, *GetWorkplaceByUniqueTagRequest) (*Workplace, error)
 	CreateWorkplace(context.Context, *CreateWorkplaceRequest) (*Workplace, error)
 	UpdateWorkplace(context.Context, *UpdateWorkplaceRequest) (*Workplace, error)
 	DeleteWorkplace(context.Context, *DeleteWorkplaceRequest) (*DeleteWorkplaceResponse, error)
-	// Методы для управления парковочными местами
 	GetParkingSpaces(context.Context, *GetParkingSpacesRequest) (*GetParkingSpacesResponse, error)
 	GetParkingSpaceById(context.Context, *GetParkingSpaceByIdRequest) (*ParkingSpace, error)
 	CreateParkingSpace(context.Context, *CreateParkingSpaceRequest) (*ParkingSpace, error)
 	UpdateParkingSpace(context.Context, *UpdateParkingSpaceRequest) (*ParkingSpace, error)
 	DeleteParkingSpace(context.Context, *DeleteParkingSpaceRequest) (*DeleteParkingSpaceResponse, error)
-	// Методы для управления предметами
 	GetItems(context.Context, *GetItemsRequest) (*GetItemsResponse, error)
 	GetItemById(context.Context, *GetItemByIdRequest) (*Item, error)
 	CreateItem(context.Context, *CreateItemRequest) (*Item, error)

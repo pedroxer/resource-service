@@ -233,6 +233,7 @@ message DeleteItemResponse {
 }
 
 message AttachItemToWorkplaceRequest {
-    int64 item_id = 1;
-    int64 workplace_id = 2;
-  }
+  int64 item_id = 1;
+  int64 workplace_id = 2;
+}
+
