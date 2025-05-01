@@ -2,6 +2,7 @@ package items
 
 import (
 	"context"
+	"fmt"
 	"github.com/pedroxer/resource-service/internal/models"
 	"github.com/pedroxer/resource-service/internal/storage"
 	log "github.com/sirupsen/logrus"
@@ -110,6 +111,9 @@ func (d DefaultItemService) UpdateItem(ctx context.Context, item models.Item) (m
 			Name:  "workplace_id",
 			Value: item.WorkplaceId,
 		})
+	}
+	if len(updateFields) == 0 {
+		return item, fmt.Errorf("nothing to update")
 	}
 	item, err := d.creater.UpdateItem(ctx, item.Id, updateFields)
 	if err != nil {

@@ -2,6 +2,7 @@ package workplace
 
 import (
 	"context"
+	"fmt"
 	"github.com/pedroxer/resource-service/internal/models"
 	"github.com/pedroxer/resource-service/internal/storage"
 	"github.com/pedroxer/resource-service/internal/utills"
@@ -168,7 +169,9 @@ func (d DefaultWorkplaceService) UpdateWorkplace(ctx context.Context, workplace 
 			Value: workplace.UniqueTag,
 		})
 	}
-
+	if len(updateFields) == 0 {
+		return workplace, fmt.Errorf("no fields to update")
+	}
 	finalWorkplace, err := d.creater.UpdateWorkplace(ctx, workplace.Id, updateFields)
 	if err != nil {
 		d.logger.Warn(err.Error())

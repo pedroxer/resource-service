@@ -217,10 +217,10 @@ func (s *Storage) UpdateWorkplace(ctx context.Context, id int64, updateFields []
 	var updateQueryBuilder strings.Builder
 	updateQueryBuilder.WriteString("UPDATE resource_service.workplace SET ")
 	for _, field := range updateFields {
-		updateQueryBuilder.WriteString(fmt.Sprintf("%s = '%s' AND ", field.Name, fmt.Sprint(field.Value)))
+		updateQueryBuilder.WriteString(fmt.Sprintf("%s = '%s', ", field.Name, fmt.Sprint(field.Value)))
 	}
 	updateQuery := updateQueryBuilder.String()
-	updateQuery = strings.Trim(updateQuery, "AND ")
+	updateQuery = strings.Trim(updateQuery, ", ")
 	updateQuery += fmt.Sprintf(" WHERE id = %d RETURNING *", id)
 
 	var result models.Workplace
@@ -235,11 +235,10 @@ func (s *Storage) UpdateWorkplace(ctx context.Context, id int64, updateFields []
 		&result.Description,
 		&result.IsAvailable,
 		&result.MaintenanceStatus,
-		&result.UniqueTag,
 		&result.CreatedAt,
 		&result.UpdatedAt,
+		&result.UniqueTag,
 	); err != nil {
-		s.logger.Warn(err.Error())
 		return models.Workplace{}, err
 	}
 	return result, nil

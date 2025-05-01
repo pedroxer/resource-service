@@ -12,7 +12,7 @@ import (
 )
 
 type ParkingService interface {
-	GetParkingSpaces(ctx context.Context, address, zone, spaceType string, isAvailable bool, page int64) ([]models.ParkingPlace, int64, error)
+	GetParkingSpaces(ctx context.Context, address, zone, spaceType string, isAvailable bool, number, page int64) ([]models.ParkingPlace, int64, error)
 	GetParkingSpaceById(ctx context.Context, id int64) (models.ParkingPlace, error)
 	CreateParkingSpace(ctx context.Context, parkingSpace models.ParkingPlace) (int64, error)
 	UpdateParkingSpace(ctx context.Context, parkingSpace models.ParkingPlace) (models.ParkingPlace, error)
@@ -23,7 +23,7 @@ func (s *serverAPI) GetParkingSpaces(ctx context.Context, req *proto_gen.GetPark
 	if req.GetPage() == 0 {
 		req.Page = 1
 	}
-	parkingSpaces, amount, err := s.parkings.GetParkingSpaces(ctx, req.Address, req.Zone, req.Type, req.IsAvailable, req.Page)
+	parkingSpaces, amount, err := s.parkings.GetParkingSpaces(ctx, req.Address, req.Zone, req.Type, req.IsAvailable, req.Number, req.Page)
 	if err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}

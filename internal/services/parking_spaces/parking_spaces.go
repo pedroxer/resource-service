@@ -2,6 +2,7 @@ package parking_spaces
 
 import (
 	"context"
+	"fmt"
 	"github.com/pedroxer/resource-service/internal/models"
 	"github.com/pedroxer/resource-service/internal/storage"
 	log "github.com/sirupsen/logrus"
@@ -31,7 +32,7 @@ func NewDefaultParkingSpaceService(storage *storage.Storage, logger *log.Logger)
 	}
 }
 
-func (d DefaultParkingSpaceService) GetParkingSpaces(ctx context.Context, address, zone, spaceType string, isAvailable bool, page int64) ([]models.ParkingPlace, int64, error) {
+func (d DefaultParkingSpaceService) GetParkingSpaces(ctx context.Context, address, zone, spaceType string, isAvailable bool, number, page int64) ([]models.ParkingPlace, int64, error) {
 	filter := make([]storage.Field, 0)
 	if address != "" {
 		filter = append(filter, storage.Field{
@@ -51,12 +52,17 @@ func (d DefaultParkingSpaceService) GetParkingSpaces(ctx context.Context, addres
 			Value: spaceType,
 		})
 	}
-	if isAvailable {
+	if number != 0 {
 		filter = append(filter, storage.Field{
-			Name:  "is_available",
-			Value: isAvailable,
+			Name:  "number",
+			Value: number,
 		})
 	}
+	filter = append(filter, storage.Field{
+		Name:  "is_available",
+		Value: isAvailable,
+	})
+
 	spaces, amount, err := d.getter.GetParkingLots(ctx, filter, page)
 	if err != nil {
 		d.logger.Warn("error getting spaces", err.Error())
@@ -96,6 +102,12 @@ func (d DefaultParkingSpaceService) UpdateParkingSpace(ctx context.Context, park
 			Value: parkingSpace.Address,
 		})
 	}
+	if parkingSpace.Number != 0 {
+		updateFields = append(updateFields, storage.Field{
+			Name:  "number",
+			Value: parkingSpace.Number,
+		})
+	}
 	if parkingSpace.Zone != "" {
 		updateFields = append(updateFields, storage.Field{
 			Name:  "zone",
@@ -114,7 +126,9 @@ func (d DefaultParkingSpaceService) UpdateParkingSpace(ctx context.Context, park
 			Value: parkingSpace.IsAvailable,
 		})
 	}
-
+	if len(updateFields) == 0 {
+		return parkingSpace, fmt.Errorf("nothing to update")
+	}
 	parkingSpace, err = d.creater.UpdateParkingLot(ctx, parkingSpace.Id, updateFields)
 	if err != nil {
 		d.logger.Warn("error updating space", err.Error())

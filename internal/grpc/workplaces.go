@@ -58,6 +58,9 @@ func (s *serverAPI) GetWorkplaceByUniqueTag(ctx context.Context, req *proto_gen.
 	return castServiceWorkplaceToProto(workplace), nil
 }
 func (s *serverAPI) CreateWorkplace(ctx context.Context, req *proto_gen.CreateWorkplaceRequest) (*proto_gen.Workplace, error) {
+	if req.GetAddress() == "" || req.GetType() == "" || req.Capacity == 0 || req.Number == 0 || req.Floor == 0 {
+		return nil, status.Error(codes.InvalidArgument, "address, type, capacity, number and floor are required")
+	}
 	workplace, err := s.workplaces.CreateWorkplace(ctx, models.Workplace{
 		Address:           req.Address,
 		Zone:              req.Zone,

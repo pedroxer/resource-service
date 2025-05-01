@@ -125,10 +125,10 @@ func (s *Storage) UpdateItem(ctx context.Context, id int64, updateFields []Field
 	var updateQueryBuilder strings.Builder
 	updateQueryBuilder.WriteString("UPDATE resource_service.items SET ")
 	for _, field := range updateFields {
-		updateQueryBuilder.WriteString(fmt.Sprintf("%s = '%s' AND ", field.Name, fmt.Sprint(field.Value)))
+		updateQueryBuilder.WriteString(fmt.Sprintf("%s = '%s', ", field.Name, fmt.Sprint(field.Value)))
 	}
 	updateQuery := updateQueryBuilder.String()
-	updateQuery = strings.Trim(updateQuery, "AND ")
+	updateQuery = strings.Trim(updateQuery, ", ")
 	updateQuery += fmt.Sprintf(" WHERE id = %d RETURNING *", id)
 	var result models.Item
 	if err := s.db.QueryRow(ctx, updateQuery).Scan(
