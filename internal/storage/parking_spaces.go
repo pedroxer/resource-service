@@ -33,7 +33,7 @@ var lotsFields = []string{
 }
 
 func (s *Storage) GetParkingLots(ctx context.Context, filters []Field, page int64) ([]models.ParkingPlace, int64, error) {
-	from := ` FROM resource_service.parking_spaces space`
+	from := ` FROM resource_service.parking_spaces`
 	selectQuery := "SELECT " + strings.Join(lotsFields, ", ") + from
 
 	countQuery := `SELECT count(*) FROM (` + selectQuery
