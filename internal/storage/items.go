@@ -2,6 +2,8 @@ package storage
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/pedroxer/resource-service/internal/models"
 	"github.com/pedroxer/resource-service/internal/utills"
@@ -46,6 +48,9 @@ func (s *Storage) GetItems(ctx context.Context, filters []Field, page int64) ([]
 	selectQuery += conditions.String() + GenerateLimits(page, utills.PageSize)
 
 	rows, err := s.db.Query(ctx, selectQuery)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, 0, utills.ErrNoRows
+	}
 	if err != nil {
 		s.logger.Warn(err.Error())
 		return nil, 0, err
@@ -101,6 +106,9 @@ func (s *Storage) GetItemById(ctx context.Context, id int64) (models.Item, error
 		&item.UpdatedAt,
 		&item.CreatedAt,
 	); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return models.Item{}, utills.ErrNoRows
+		}
 		s.logger.Warn(err.Error())
 		return models.Item{}, err
 	}
@@ -140,6 +148,9 @@ func (s *Storage) UpdateItem(ctx context.Context, id int64, updateFields []Field
 		&result.UpdatedAt,
 		&result.CreatedAt,
 	); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return models.Item{}, utills.ErrNoRows
+		}
 		s.logger.Warn("cannot update item", err.Error())
 		return models.Item{}, err
 	}
@@ -150,6 +161,9 @@ func (s *Storage) UpdateItem(ctx context.Context, id int64, updateFields []Field
 func (s *Storage) DeleteItem(ctx context.Context, id int64) error {
 	query := `DELETE FROM resource_service.items WHERE id = $1`
 	if _, err := s.db.Exec(ctx, query, id); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return utills.ErrNoRows
+		}
 		s.logger.Warn("cannot delete item", err.Error())
 		return err
 	}
@@ -173,10 +187,12 @@ func (s *Storage) GetItemsByWorkplaceId(ctx context.Context, workplaceId int64) 
 
 	var items []models.Item
 	rows, err := s.db.Query(ctx, query, workplaceId)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, utills.ErrNoRows
+	}
 	if err != nil {
 		return nil, err
 	}
-
 	for rows.Next() {
 		var item models.Item
 		err := rows.Scan(&item.Id, &item.Name, &item.Type, &item.Condition, &item.UpdatedAt, &item.CreatedAt)
@@ -199,6 +215,9 @@ func (s *Storage) GetItemsByWorkplaceIds(ctx context.Context, workplaceIds []int
 		   
 	INNER JOIN resource_service.item_conditions ic on ic.id = i.condition_id WHERE i.workplace_id = ANY($1)`
 	rows, err := s.db.Query(ctx, query, workplaceIds)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, utills.ErrNoRows
+	}
 	if err != nil {
 		s.logger.Warn(err.Error())
 		return nil, err

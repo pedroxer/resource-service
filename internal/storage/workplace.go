@@ -2,6 +2,8 @@ package storage
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/pedroxer/resource-service/internal/models"
 	"github.com/pedroxer/resource-service/internal/utills"
@@ -59,6 +61,9 @@ func (s *Storage) GetWorkplaces(ctx context.Context, filters []Field, withItems 
 	selectQuery += conditions.String() + GenerateLimits(page, utills.PageSize)
 
 	rows, err := s.db.Query(ctx, selectQuery)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, 0, utills.ErrNoRows
+	}
 	if err != nil {
 		s.logger.Warn(err.Error())
 		return nil, 0, err
@@ -130,6 +135,9 @@ func (s *Storage) GetWorkplacesById(ctx context.Context, id int64) (models.Workp
 		&workplace.UpdatedAt,
 		&workplace.UniqueTag,
 	); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return models.Workplace{}, utills.ErrNoRows
+		}
 		s.logger.Warn(err.Error())
 		return models.Workplace{}, err
 	}
@@ -162,6 +170,9 @@ func (s *Storage) GetWorkplaceByUniqueTag(ctx context.Context, uniqueTag string)
 		&workplace.UpdatedAt,
 		&workplace.UniqueTag,
 	); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return models.Workplace{}, utills.ErrNoRows
+		}
 		s.logger.Warn(err.Error())
 		return models.Workplace{}, err
 	}
@@ -239,6 +250,9 @@ func (s *Storage) UpdateWorkplace(ctx context.Context, id int64, updateFields []
 		&result.UpdatedAt,
 		&result.UniqueTag,
 	); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return models.Workplace{}, utills.ErrNoRows
+		}
 		return models.Workplace{}, err
 	}
 	return result, nil
@@ -249,6 +263,9 @@ func (s *Storage) DeleteWorkplace(ctx context.Context, id int64) error {
 
 	_, err := s.db.Exec(ctx, query, id)
 	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return utills.ErrNoRows
+		}
 		s.logger.Warn(err.Error())
 		return err
 	}

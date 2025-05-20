@@ -2,6 +2,8 @@ package storage
 
 import (
 	"context"
+	"database/sql"
+	"errors"
 	"fmt"
 	"github.com/pedroxer/resource-service/internal/models"
 	"github.com/pedroxer/resource-service/internal/utills"
@@ -48,6 +50,9 @@ func (s *Storage) GetParkingLots(ctx context.Context, filters []Field, page int6
 	selectQuery += conditions.String() + GenerateLimits(page, utills.PageSize)
 
 	rows, err := s.db.Query(ctx, selectQuery)
+	if errors.Is(err, sql.ErrNoRows) {
+		return nil, 0, utills.ErrNoRows
+	}
 	if err != nil {
 		s.logger.Warn(err.Error())
 		return nil, 0, err
@@ -98,6 +103,9 @@ func (s *Storage) GetParkingLotById(ctx context.Context, id int64) (models.Parki
 		&lot.CreatedAt,
 		&lot.UpdatedAt,
 	); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return models.ParkingPlace{}, utills.ErrNoRows
+		}
 		s.logger.Warn("error getting space", err.Error())
 		return models.ParkingPlace{}, err
 	}
@@ -135,6 +143,9 @@ func (s *Storage) UpdateParkingLot(ctx context.Context, id int64, updateFields [
 		&result.CreatedAt,
 		&result.UpdatedAt,
 	); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return models.ParkingPlace{}, utills.ErrNoRows
+		}
 		s.logger.Warn("cannot update space", err.Error())
 		return models.ParkingPlace{}, err
 	}
@@ -145,6 +156,9 @@ func (s *Storage) UpdateParkingLot(ctx context.Context, id int64, updateFields [
 func (s *Storage) DeleteParkingLot(ctx context.Context, id int64) error {
 	query := `DELETE FROM resource_service.parking_spaces WHERE id = $1`
 	if _, err := s.db.Exec(ctx, query, id); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return utills.ErrNoRows
+		}
 		s.logger.Warn("cannot delete space", err.Error())
 		return err
 	}

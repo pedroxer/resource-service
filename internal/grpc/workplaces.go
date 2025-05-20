@@ -26,7 +26,7 @@ func (s *serverAPI) GetWorkplaces(ctx context.Context, req *proto_gen.GetWorkpla
 	}
 	workplaces, amount, err := s.workplaces.GetWorkplaces(ctx, req.Zone, req.Type, req.Floor, req.Capacity, req.IsAvailable, req.WithItems, req.Page, utills.PageSize)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, generateErrors(err)
 	}
 	response := new(proto_gen.GetWorkplacesResponse)
 	response.Workplaces = make([]*proto_gen.Workplace, 0)
@@ -42,7 +42,7 @@ func (s *serverAPI) GetWorkplaces(ctx context.Context, req *proto_gen.GetWorkpla
 func (s *serverAPI) GetWorkplaceById(ctx context.Context, req *proto_gen.GetWorkplaceByIdRequest) (*proto_gen.Workplace, error) {
 	workplace, err := s.workplaces.GetWorkplacesById(ctx, req.Id)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, generateErrors(err)
 	}
 	return castServiceWorkplaceToProto(workplace), nil
 }
@@ -53,7 +53,7 @@ func (s *serverAPI) GetWorkplaceByUniqueTag(ctx context.Context, req *proto_gen.
 	}
 	workplace, err := s.workplaces.GetWorkplaceByUniqueTag(ctx, req.UniqueTag)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, generateErrors(err)
 	}
 	return castServiceWorkplaceToProto(workplace), nil
 }
@@ -75,7 +75,7 @@ func (s *serverAPI) CreateWorkplace(ctx context.Context, req *proto_gen.CreateWo
 		MaintenanceStatus: req.MaintenanceStatus,
 	})
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, generateErrors(err)
 	}
 	return castServiceWorkplaceToProto(workplace), nil
 }
@@ -98,7 +98,7 @@ func (s *serverAPI) UpdateWorkplace(ctx context.Context, req *proto_gen.UpdateWo
 		MaintenanceStatus: req.MaintenanceStatus,
 	})
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, generateErrors(err)
 	}
 	return castServiceWorkplaceToProto(workplace), nil
 }

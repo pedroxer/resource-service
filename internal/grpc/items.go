@@ -25,7 +25,8 @@ func (s *serverAPI) GetItems(ctx context.Context, req *proto_gen.GetItemsRequest
 	}
 	items, amount, err := s.items.GetItems(ctx, req.Type, req.Name, req.ConditionId, req.WorkplaceId, req.Page, utills.PageSize)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+
+		return nil, generateErrors(err)
 	}
 	response := new(proto_gen.GetItemsResponse)
 	response.Items = make([]*proto_gen.Item, 0)
@@ -52,7 +53,7 @@ func (s *serverAPI) GetItemById(ctx context.Context, req *proto_gen.GetItemByIdR
 	}
 	item, err := s.items.GetItemById(ctx, req.Id)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, generateErrors(err)
 	}
 	return &proto_gen.Item{
 		Id:          item.Id,
@@ -75,7 +76,7 @@ func (s *serverAPI) CreateItem(ctx context.Context, req *proto_gen.CreateItemReq
 	}
 	id, err := s.items.CreateItem(ctx, item)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, generateErrors(err)
 	}
 	return &proto_gen.Item{
 		Id:          id,
@@ -102,7 +103,7 @@ func (s *serverAPI) UpdateItem(ctx context.Context, req *proto_gen.UpdateItemReq
 	}
 	resp, err := s.items.UpdateItem(ctx, item)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, generateErrors(err)
 	}
 	return &proto_gen.Item{
 		Id:          resp.Id,
@@ -121,7 +122,7 @@ func (s *serverAPI) DeleteItem(ctx context.Context, req *proto_gen.DeleteItemReq
 	}
 	err := s.items.DeleteItem(ctx, req.Id)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, generateErrors(err)
 	}
 	return &proto_gen.DeleteItemResponse{Success: true}, nil
 }

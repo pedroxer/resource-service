@@ -25,7 +25,7 @@ func (s *serverAPI) GetParkingSpaces(ctx context.Context, req *proto_gen.GetPark
 	}
 	parkingSpaces, amount, err := s.parkings.GetParkingSpaces(ctx, req.Address, req.Zone, req.Type, req.IsAvailable, req.Number, req.Page)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, generateErrors(err)
 	}
 	response := new(proto_gen.GetParkingSpacesResponse)
 	response.ParkingSpaces = make([]*proto_gen.ParkingSpace, 0)
@@ -44,7 +44,7 @@ func (s *serverAPI) GetParkingSpaceById(ctx context.Context, req *proto_gen.GetP
 	}
 	parkingSpace, err := s.parkings.GetParkingSpaceById(ctx, req.Id)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, generateErrors(err)
 	}
 	return castServiceParkingSpaceToProto(parkingSpace), nil
 }
@@ -64,7 +64,7 @@ func (s *serverAPI) CreateParkingSpace(ctx context.Context, req *proto_gen.Creat
 		UpdatedAt:   time.Now(),
 	})
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, generateErrors(err)
 	}
 	return castServiceParkingSpaceToProto(models.ParkingPlace{
 		Id:          id,
@@ -92,7 +92,7 @@ func (s *serverAPI) UpdateParkingSpace(ctx context.Context, req *proto_gen.Updat
 		UpdatedAt:   time.Now(),
 	})
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, generateErrors(err)
 	}
 	return castServiceParkingSpaceToProto(parkingSpace), nil
 }
@@ -102,7 +102,7 @@ func (s *serverAPI) DeleteParkingSpace(ctx context.Context, req *proto_gen.Delet
 	}
 	err := s.parkings.DeleteParkingSpace(ctx, req.Id)
 	if err != nil {
-		return nil, status.Error(codes.Internal, err.Error())
+		return nil, generateErrors(err)
 	}
 	return &proto_gen.DeleteParkingSpaceResponse{Success: true}, nil
 }
