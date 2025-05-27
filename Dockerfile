@@ -19,6 +19,8 @@ COPY . .
 
 COPY --from=builder /resource-service .
 
-EXPOSE 8081
+RUN apk --update --no-cache add curl
+EXPOSE 8083
+EXPOSE 2122
 
 CMD ["./resource-service"]

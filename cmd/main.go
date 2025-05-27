@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	prom "github.com/pedroxer/resource-service/internal/prometheus"
 	"os"
 
 	"github.com/caarlos0/env/v6"
@@ -26,6 +27,15 @@ func main() {
 		log.Fatal(err)
 	}
 
+	go func() {
+		err = prom.RunRestServer()
+		if err != nil {
+			log.Fatal(err)
+		}
+	}()
+	if err := prom.MetricsInit(); err != nil {
+		log.Fatal(err)
+	}
 	store, err := storage.NewStorage(&cfg.Postgres, log)
 	if err != nil {
 		log.Fatalf("failed connect to db %s", err)

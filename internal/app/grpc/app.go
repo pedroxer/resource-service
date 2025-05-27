@@ -16,8 +16,14 @@ type App struct {
 	port       int
 }
 
+type Interceptor interface {
+	Unary() grpc.UnaryServerInterceptor
+	Stream() grpc.StreamServerInterceptor
+}
+
 func NewApp(log *log.Logger, port int, workplaceService mygrpc.WorkplaceService, itemService mygrpc.ItemService, parkingSpaceService mygrpc.ParkingService) *App {
-	server := grpc.NewServer()
+	interceptor := mygrpc.NewMetricInterceptor()
+	server := grpc.NewServer(grpc.UnaryInterceptor(interceptor.Unary()), grpc.StreamInterceptor(interceptor.Stream()))
 	mygrpc.Register(server, log, itemService, workplaceService, parkingSpaceService)
 	reflection.Register(server)
 	return &App{

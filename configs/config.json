@@ -1,7 +1,7 @@
 {
-  "port": 8081,
+  "port": 8083,
   "postgres": {
-    "host": "localhost",
+    "host": "app-postgres",
     "port": 5432,
     "db": "booking",
     "sslmode": "disable"
